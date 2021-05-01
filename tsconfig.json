@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "esnext",
+    "strict": true,
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "sourceMap": true,
+    "allowJs": true,
+    "checkJs": true,
+    "declaration": false,
+    "resolveJsonModule": true,
+    "baseUrl": ".",
+    "isolatedModules": true,
+    "experimentalDecorators": true,
+    "lib": ["esnext", "dom", "dom.iterable"],
+    "outDir": "./dist"
+  },
+  "include": ["src"],
+  "exclude": ["node_modules"]
+}

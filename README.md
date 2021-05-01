@@ -1,2 +1,3 @@
 # starboard-mathlive
-Mathlive in a starboard notebook! 
+
+Mathlive in a starboard notebook!

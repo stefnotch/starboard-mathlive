@@ -1,0 +1,47 @@
+{
+  "name": "starboard-mathlive",
+  "version": "0.1.1",
+  "description": "Mathlive cells for Starboard Notebook",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "scripts": {
+    "build": "rimraf dist && rollup -c rollup.config.ts",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepublishOnly": "npm i && npm run build",
+    "start": "npm run build && serve dist -l 8080"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stefnotch/starboard-mathlive.git"
+  },
+  "keywords": [
+    "starboard",
+    "starboard-notebook",
+    "notebook"
+  ],
+  "author": "Stefnotch",
+  "license": "CC0",
+  "bugs": {
+    "url": "https://github.com/stefnotch/starboard-mathlive/issues"
+  },
+  "homepage": "https://github.com/stefnotch/starboard-mathlive#readme",
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^18.0.0",
+    "@rollup/plugin-node-resolve": "^11.2.1",
+    "@types/iframe-resizer": "^3.5.8",
+    "@types/markdown-it": "^12.0.1",
+    "clean-css": "^5.1.2",
+    "lit-html": "^1.4.0",
+    "rimraf": "^3.0.2",
+    "rollup": "^2.46.0",
+    "rollup-plugin-dts": "^3.0.1",
+    "rollup-plugin-typescript2": "^0.30.0",
+    "starboard-notebook": "^0.8.13",
+    "typescript": "^4.2.4",
+    "serve": "^11.3.2"
+  },
+  "dependencies": {
+    "mathlive": "^0.63.0"
+  }
+}

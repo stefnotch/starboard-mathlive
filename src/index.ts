@@ -11,13 +11,15 @@ import {
 import { html, render } from "lit-html";
 import { unsafeHTML } from "lit-html/directives/unsafe-html";
 import { Runtime } from "starboard-notebook/dist/src/types";
-import type { StarboardTextEditor as StarboardTextEditorType } from "starboard-notebook/dist/src/components/textEditor";
+import type { MathfieldElement } from "mathlive";
 
 declare global {
   interface Window {
     runtime: Runtime;
   }
 }
+
+const mathlivePromise = import("mathlive");
 
 export function registerMathlive() {
   /* These globals are exposed by Starboard Notebook. We can re-use them so we don't have to bundle them again. */
@@ -37,7 +39,7 @@ export function registerMathlive() {
 
   class MathLiveCellHandler {
     private elements!: CellElements;
-    private editor!: StarboardTextEditorType;
+    private editor?: MathfieldElement;
 
     private changeListener: () => any;
 
@@ -53,10 +55,26 @@ export function registerMathlive() {
     attach(params: CellHandlerAttachParameters) {
       this.elements = params.elements;
 
-      this.editor = new StarboardTextEditor(this.cell, this.runtime, {
-        language: "css",
+      // TODO: More of this stuff https://github.com/stefnotch/quantum-sheet/blob/master/src/ui/elements/ExpressionElement.vue
+      mathlivePromise.then((ml) => {
+        const editor = new ml.MathfieldElement({
+          defaultMode: "math",
+          smartSuperscript: true,
+          plonkSound: null as any,
+          keypressSound: null as any,
+          onContentDidChange: (mf) =>
+            (this.cell.textContent = mf.getValue("latex")),
+        });
+
+        editor.value = this.cell.textContent;
+
+        // TODO: Turn off the accessible part? Or at least hide the errors?
+        // `mathfield.accessibleNode.innerHTML = mathfield.options.createHTML(`
+
+        this.editor = editor;
+        this.elements.topElement.appendChild(editor);
       });
-      this.elements.topElement.appendChild(this.editor);
+
       this.runtime.controls.subscribeToCellChanges(
         this.cell.id,
         this.changeListener
@@ -66,23 +84,22 @@ export function registerMathlive() {
 
     async run() {
       const content = this.cell.textContent;
-      if (content) {
+      /*if (content) {
         render(
           html`${unsafeHTML("\n" + content + "\n")}`,
           this.elements.bottomElement
         );
-      }
+      }*/
     }
 
     focusEditor() {
-      if (this.editor) {
-        this.editor.focus();
-      }
+      this.editor?.focus?.();
     }
 
     async dispose() {
-      if (this.editor) {
-        this.editor.dispose();
+      const editor = this.editor;
+      if (editor) {
+        this.elements.topElement.removeChild(editor);
       }
       this.runtime.controls.unsubscribeToCellChanges(
         this.cell.id,

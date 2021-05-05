@@ -26,3 +26,4 @@ Notebook in URL :thinking:
 
 https://caniuse.com/async-clipboard
 
+https://github.com/michael-brade/LaTeX.js

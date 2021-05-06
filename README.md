@@ -29,6 +29,6 @@ https://caniuse.com/async-clipboard
 https://github.com/michael-brade/LaTeX.js
 
 
-`Shift`+`Enter` at the last line: focuses the create cell button
-`js`: the search thingy is searching for js and suggests the Javascript cell type
+`Shift`+`Enter` at the last line: focuses the create cell button  
+`js`: the search thingy is searching for js and suggests the Javascript cell type  
 `Enter`: Inserts the Javascript cell

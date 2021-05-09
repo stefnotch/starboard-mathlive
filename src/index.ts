@@ -64,6 +64,8 @@ export function registerMathlive() {
           keypressSound: null as any,
           onContentDidChange: (mf) =>
             (this.cell.textContent = mf.getValue("latex")),
+          // onCommit: (mf) => TODO: Add a new math cell below?
+          // onMoveOutOf: (mf, direction) => TODO: Move to next/prev cell
         });
 
         editor.value = this.cell.textContent;

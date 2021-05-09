@@ -33,5 +33,6 @@ https://github.com/michael-brade/LaTeX.js
 `js`: the search thingy is searching for js and suggests the Javascript cell type  
 `Enter`: Inserts the Javascript cell
 
-todo: alternative smart superscript: typing a plus or minus should jump out of the superscript
-todo: mathlive should automatically place/make big brackets
+todo: alternative smart superscript: typing a plus or minus should jump out of the superscript  
+todo: mathlive should automatically place/make big brackets  
+todo: mathlive highlighting behaviour?  

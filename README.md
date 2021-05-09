@@ -34,3 +34,4 @@ https://github.com/michael-brade/LaTeX.js
 `Enter`: Inserts the Javascript cell
 
 todo: alternative smart superscript: typing a plus or minus should jump out of the superscript
+todo: mathlive should automatically place/make big brackets

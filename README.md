@@ -28,7 +28,7 @@ https://caniuse.com/async-clipboard
 
 https://github.com/michael-brade/LaTeX.js
 
-either publish to npm or build a starboard website and publish to github pages
+either publish to npm or build a starboard website and publish to github pages (or both!) (publish to npm & in another repo, make the starboard website)
 
 `Shift`+`Enter` at the last line: focuses the create cell button  
 `js`: the search thingy is searching for js and suggests the Javascript cell type  

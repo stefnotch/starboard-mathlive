@@ -21,12 +21,13 @@
     const mount = document.querySelector("#mount-point");
 
     const el = new StarboardEmbed({
-      notebookContent: `# %%--- [esm]
-# properties:
-#   run_on_load: true
-# ---%%
-import {plugin} from "http://localhost:8080/index.js";
-runtime.controls.registerPlugin(plugin, {})
+      notebookContent: `---
+starboard:
+  plugins:
+    - src: "localhost:8080/index.js"
+      async: true
+---
+      
 
 # %%--- [javascript]
 # properties:

@@ -21,7 +21,58 @@
     const mount = document.querySelector("#mount-point");
 
     const el = new StarboardEmbed({
-      notebookContent: "# %% [javascript]\n3+5\n",
+      notebookContent: `# %%--- [esm]
+# properties:
+#   run_on_load: true
+# ---%%
+import {plugin} from "http://localhost:8080/index.js";
+runtime.controls.registerPlugin(plugin, {})
+
+# %%--- [javascript]
+# properties:
+#   run_on_load: true
+#   top_hidden: true
+# ---%%
+const outputEl = document.createElement("code");
+outputEl.classList.add("small");
+
+function serializeCell(cell) {
+  if (cell.cellType === "markdown") {
+    return cell.textContent;
+  } else if(cell.cellType === "mathlive") {
+    return "\$\\\\displaystyle " + cell.textContent.trim() + "\$";
+  } else {
+    return \`\\\`\\\`\\\`\${cell.cellType}\\n\${cell.textContent}\\n\\\`\\\`\\\`\`;
+  }
+}
+
+// Note: Doesn't serialize any cell or notebook metadata
+function serializeAsMarkdown() {
+  const md = runtime.content.cells.filter((c,i) => i >= 2).map(c => serializeCell(c)).join("\\n")
+  outputEl.innerText = md;
+}
+
+html\`
+  <button class="btn btn-primary m-2" @click="\${serializeAsMarkdown}">Show notebook MD representation</button>
+<pre>\${outputEl}</pre>
+\`
+
+# %% [markdown]
+# Exercise
+Calculate the following
+# %% [mathlive]
+\\frac{d}{dx}(\\frac{3}{\\log(7)}\\cdot x^{3x})
+# %% [markdown]
+## Solution
+
+# %% [mathlive]
+\\frac{d}{dx}(\\frac{3}{\\log(7)}\\cdot x^{3x})
+# %% [mathlive]
+\\frac{d}{dx}(\\frac{3}{\\log(7)}\\cdot e^{3x\\cdot log(x)})
+# %% [mathlive]
+\\frac{3}{\\log(7)}\\cdot e^{3x\\cdot log(x)}\\cdot(3\\cdot\\log(x)+\\frac{3x}{x})
+# %% [mathlive]
+\\frac{3}{\\log(7)}\\cdot x^{3x}\\cdot(3\\cdot\\log(x)+3)`,
       src: "https://unpkg.com/starboard-notebook@0.10.1/dist/index.html",
     });
 

@@ -4,12 +4,13 @@ import "mathlive/dist/mathlive-fonts.css";
 import {
   CellTypeDefinition,
   CellHandlerAttachParameters,
+  CellHandler,
   CellElements,
   Cell,
   StarboardPlugin,
 } from "starboard-notebook/dist/src/types";
-import { html, render } from "lit-html";
-import { unsafeHTML } from "lit-html/directives/unsafe-html";
+import { html, render } from "lit";
+import { unsafeHTML } from "lit/directives/unsafe-html";
 import { Runtime } from "starboard-notebook/dist/src/types";
 import type { MathfieldElement } from "mathlive";
 
@@ -21,10 +22,9 @@ declare global {
 
 const mathlivePromise = import("mathlive");
 
-export function registerMathlive() {
+export function registerMathlive(runtime: Runtime) {
   /* These globals are exposed by Starboard Notebook. We can re-use them so we don't have to bundle them again. */
-  const runtime = window.runtime;
-  const lithtml = runtime.exports.libraries.LitHtml;
+  const lit = runtime.exports.libraries.lit;
 
   const StarboardTextEditor = runtime.exports.elements.StarboardTextEditor;
   const cellControlsTemplate = runtime.exports.templates.cellControls;
@@ -37,7 +37,7 @@ export function registerMathlive() {
       new MathLiveCellHandler(cell, runtime),
   };
 
-  class MathLiveCellHandler {
+  class MathLiveCellHandler implements CellHandler {
     private elements!: CellElements;
     private editor?: MathfieldElement;
 
@@ -50,6 +50,10 @@ export function registerMathlive() {
       this.changeListener = () => this.run();
       this.cell = cell;
       this.runtime = runtime;
+    }
+
+    clear(): void {
+      // Nothing to clear, so eh
     }
 
     attach(params: CellHandlerAttachParameters) {
@@ -122,7 +126,7 @@ export const plugin: StarboardPlugin = {
     name: "Starboard Mathlive",
   },
   exports: {},
-  async register(opts = {}) {
-    registerMathlive();
+  async register(runtime, opts = {}) {
+    registerMathlive(runtime);
   },
 };

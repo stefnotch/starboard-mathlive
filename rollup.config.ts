@@ -33,6 +33,7 @@ export default [
       copy({
         targets: [
           { src: "node_modules/mathlive/dist/fonts/*", dest: "dist/fonts" },
+          { src: "index.html", dest: "dist" },
         ],
       }),
     ],

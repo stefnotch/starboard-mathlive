@@ -28,15 +28,50 @@
   <!-- Don't do it unless you absolutely trust the input and have nothing else on the website -->
   <!-- prettier-ignore -->
   <script type="application/vnd.starboard.nb">
----
-starboard:
-  plugins:
-    - src: "http://localhost:8080/index.js"
-      async: true
-    - src: "https://stefnotch.github.io/starboard-mathlive/index.js"
-      async: true
----
+# %%--- [esm]
+# properties:
+#   run_on_load: true
+#   top_hidden: true
+# ---%%
+/**
+ * @returns {"release"|"development"|"debug"}
+ */
+function getMode() {
+  let urlParams = new URLSearchParams(window.location.search);
+  let mode = urlParams.get("mode");
 
+  // If a mode is specified
+  if (mode != undefined) {
+    let modeString = mode.toString().toLowerCase();
+    if (modeString.includes("rel")) {
+      return "release";
+    } else if (modeString.includes("dev")) {
+      return "development";
+    } else if (modeString.includes("deb")) {
+      return "debug";
+    }
+  }
+
+  // If no mode is specified
+  // If the website is local, it's probably in dev mode
+  let hostname = window.location.hostname.toLowerCase();
+  if (hostname.startsWith("localhost") || hostname.startsWith("127.0.0.1")) {
+    return "development";
+  } else {
+    // Otherwise it's in release mode
+    return "release";
+  }
+}
+
+if(getMode() === "release") {
+  import("https://stefnotch.github.io/starboard-mathlive/index.js").then(result => {
+    runtime.controls.registerPlugin(result.plugin, {})
+  });
+} else {
+  import("http://localhost:8080/index.js").then(result => {
+    runtime.controls.registerPlugin(result.plugin, {})
+  });
+}
 
 # %%--- [javascript]
 # properties:

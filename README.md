@@ -21,7 +21,6 @@ https://caniuse.com/async-clipboard
 
 publish to npm and publish to github pages
 
-
 Some quick shortcut/typing to insert a new cell type??
 
 `Shift`+`Enter` at the last line: focuses the create cell button  
@@ -30,6 +29,8 @@ Some quick shortcut/typing to insert a new cell type??
 
 todo: alternative smart superscript: typing a plus or minus should jump out of the superscript  
 todo: mathlive should automatically place/make big brackets  
-todo: mathlive highlighting behaviour?  
+todo: mathlive highlighting behaviour?
 
 Bugger Starboard creator about relative plugin paths
+
+We can probably avoid shipping the KaTeX fonts (because starboard depends on KaTeX)

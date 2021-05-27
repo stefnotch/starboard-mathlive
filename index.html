@@ -1,6 +1,16 @@
 <!DOCTYPE html>
 <head>
   <meta charset="utf-8" />
+  <title>Starboard Mathlive</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link
+    href="https://unpkg.com/starboard-notebook@0.10.1/dist/starboard-notebook.css"
+    rel="stylesheet"
+  />
+  <script
+    src="https://unpkg.com/starboard-notebook@0.10.1/dist/starboard-notebook.js"
+    defer
+  ></script>
   <style>
     html,
     body {
@@ -14,20 +24,17 @@
   </style>
 </head>
 <body>
-  <div id="mount-point"></div>
-
-  <script type="module">
-    import { StarboardEmbed } from "https://unpkg.com/starboard-wrap@0.3.3/dist/index.js";
-    const mount = document.querySelector("#mount-point");
-
-    const el = new StarboardEmbed({
-      notebookContent: `---
+  <!-- This is fine, it's just a static website -->
+  <!-- Don't do it unless you absolutely trust the input and have nothing else on the website -->
+  <!-- prettier-ignore -->
+  <script type="application/vnd.starboard.nb">
+---
 starboard:
   plugins:
-    - src: "localhost:8080/index.js"
+    - src: "http://localhost:8080/index.js"
       async: true
 ---
-      
+
 
 # %%--- [javascript]
 # properties:
@@ -41,42 +48,38 @@ function serializeCell(cell) {
   if (cell.cellType === "markdown") {
     return cell.textContent;
   } else if(cell.cellType === "mathlive") {
-    return "\$\\\\displaystyle " + cell.textContent.trim() + "\$";
+    return "$\\displaystyle " + cell.textContent.trim() + "$";
   } else {
-    return \`\\\`\\\`\\\`\${cell.cellType}\\n\${cell.textContent}\\n\\\`\\\`\\\`\`;
+    return `\`\`\`${cell.cellType}\n${cell.textContent}\n\`\`\``;
   }
 }
 
 // Note: Doesn't serialize any cell or notebook metadata
 function serializeAsMarkdown() {
-  const md = runtime.content.cells.filter((c,i) => i >= 2).map(c => serializeCell(c)).join("\\n")
+  const md = runtime.content.cells.filter((c,i) => i >= 2).map(c => serializeCell(c)).join("\n")
   outputEl.innerText = md;
 }
 
-html\`
-  <button class="btn btn-primary m-2" @click="\${serializeAsMarkdown}">Show notebook MD representation</button>
-<pre>\${outputEl}</pre>
-\`
+html`
+  <button class="btn btn-primary m-2" @click="${serializeAsMarkdown}">Show notebook MD representation</button>
+<pre>${outputEl}</pre>
+`
 
 # %% [markdown]
 # Exercise
 Calculate the following
 # %% [mathlive]
-\\frac{d}{dx}(\\frac{3}{\\log(7)}\\cdot x^{3x})
+\frac{d}{dx}(\frac{3}{\log(7)}\cdot x^{3x})
 # %% [markdown]
 ## Solution
 
 # %% [mathlive]
-\\frac{d}{dx}(\\frac{3}{\\log(7)}\\cdot x^{3x})
+\frac{d}{dx}(\frac{3}{\log(7)}\cdot x^{3x})
 # %% [mathlive]
-\\frac{d}{dx}(\\frac{3}{\\log(7)}\\cdot e^{3x\\cdot log(x)})
+\frac{d}{dx}(\frac{3}{\log(7)}\cdot e^{3x\cdot log(x)})
 # %% [mathlive]
-\\frac{3}{\\log(7)}\\cdot e^{3x\\cdot log(x)}\\cdot(3\\cdot\\log(x)+\\frac{3x}{x})
+\frac{3}{\log(7)}\cdot e^{3x\cdot log(x)}\cdot(3\cdot\log(x)+\frac{3x}{x})
 # %% [mathlive]
-\\frac{3}{\\log(7)}\\cdot x^{3x}\\cdot(3\\cdot\\log(x)+3)`,
-      src: "https://unpkg.com/starboard-notebook@0.10.1/dist/index.html",
-    });
-
-    mount.appendChild(el);
+\frac{3}{\log(7)}\cdot x^{3x}\cdot(3\cdot\log(x)+3)
   </script>
 </body>

@@ -14,6 +14,7 @@ todo: use this for solving a maths exercise
 todo: alternative smart superscript: typing a plus or minus should jump out of the superscript  
 todo: mathlive should automatically place/make big brackets  
 todo: mathlive highlighting behaviour?
+todo: don't bother with pyodide for now, instead focus on putting the maths editor on steroids
 
 Import/export plugin
 https://discord.com/channels/818559380827144253/818559381398487052/838187388362424331
@@ -36,10 +37,8 @@ Some quick shortcut/typing to insert a new cell type??
 `js`: the search thingy is searching for js and suggests the Javascript cell type  
 `Enter`: Inserts the Javascript cell
 
-todo: alternative smart superscript: typing a plus or minus should jump out of the superscript  
-todo: mathlive should automatically place/make big brackets  
-todo: mathlive highlighting behaviour?
 
 Bugger Starboard creator about relative plugin paths
 
 We can probably avoid shipping the KaTeX fonts (because starboard depends on KaTeX)
+

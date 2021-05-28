@@ -28,9 +28,8 @@ export function registerMathlive(runtime: Runtime) {
 
   const StarboardTextEditor = runtime.exports.elements.StarboardTextEditor;
   const cellControlsTemplate = runtime.exports.templates.cellControls;
-  const icons = runtime.exports.templates.icons;
 
-  const PYTHON_CELL_TYPE_DEFINITION: CellTypeDefinition = {
+  const MATHLIVE_CELL_TYPE_DEFINITION: CellTypeDefinition = {
     name: "Mathlive",
     cellType: ["mathlive", "math"],
     createHandler: (cell: Cell, runtime: Runtime) =>
@@ -64,12 +63,34 @@ export function registerMathlive(runtime: Runtime) {
         const editor = new ml.MathfieldElement({
           defaultMode: "math",
           smartSuperscript: true,
+          removeExtraneousParentheses: true,
+          smartFence: true,
           plonkSound: null as any,
           keypressSound: null as any,
-          onContentDidChange: (mf) =>
-            (this.cell.textContent = mf.getValue("latex")),
-          // onCommit: (mf) => TODO: Add a new math cell below?
-          // onMoveOutOf: (mf, direction) => TODO: Move to next/prev cell
+          onContentDidChange: (mf) => {
+            this.cell.textContent = mf.getValue("latex");
+          },
+          onCommit: (mf) => {
+            // TODO: Ask the CAS
+          },
+          onMoveOutOf: (mf, direction) => {
+            if (direction === "upward" || direction === "backward") {
+              this.runtime.controls.emit({
+                type: "FOCUS_CELL",
+                id: this.cell.id,
+                focus: "previous",
+              });
+              return false;
+            } else if (direction === "downward" || direction === "forward") {
+              this.runtime.controls.emit({
+                type: "FOCUS_CELL",
+                id: this.cell.id,
+                focus: "next",
+              });
+              return false;
+            }
+            return true;
+          },
         });
 
         editor.value = this.cell.textContent;
@@ -100,6 +121,7 @@ export function registerMathlive(runtime: Runtime) {
 
     focusEditor() {
       this.editor?.focus?.();
+      this.editor?.executeCommand?.("moveToMathFieldStart");
     }
 
     async dispose() {
@@ -115,8 +137,8 @@ export function registerMathlive(runtime: Runtime) {
   }
 
   runtime.definitions.cellTypes.register(
-    PYTHON_CELL_TYPE_DEFINITION.cellType,
-    PYTHON_CELL_TYPE_DEFINITION
+    MATHLIVE_CELL_TYPE_DEFINITION.cellType,
+    MATHLIVE_CELL_TYPE_DEFINITION
   );
 }
 

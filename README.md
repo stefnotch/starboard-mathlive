@@ -1,6 +1,6 @@
-# starboard-mathlive
+# [starboard-mathlive](https://stefnotch.github.io/starboard-mathlive/)
 
-Mathlive in a starboard notebook!
+Mathlive in a starboard notebook! View it in action [here](https://stefnotch.github.io/starboard-mathlive/)
 
 ## TODO: Starboard stuff
 

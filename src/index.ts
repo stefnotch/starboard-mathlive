@@ -14,12 +14,6 @@ import { unsafeHTML } from "lit/directives/unsafe-html";
 import { Runtime } from "starboard-notebook/dist/src/types";
 import type { MathfieldElement } from "mathlive";
 
-declare global {
-  interface Window {
-    runtime: Runtime;
-  }
-}
-
 const mathlivePromise = import("mathlive");
 
 export function registerMathlive(runtime: Runtime) {
@@ -28,6 +22,19 @@ export function registerMathlive(runtime: Runtime) {
 
   const StarboardTextEditor = runtime.exports.elements.StarboardTextEditor;
   const cellControlsTemplate = runtime.exports.templates.cellControls;
+
+  document.head.insertAdjacentHTML(
+    "beforeend",
+    `<style>math-field:hover,
+  math-field:focus,
+  math-field:focus-within {
+    outline: var(--border-color-secondary) auto 1px;
+  }
+  math-field {
+    transition: outline 0.2s ease-in-out;
+  }
+  </style>`
+  );
 
   const MATHLIVE_CELL_TYPE_DEFINITION: CellTypeDefinition = {
     name: "Mathlive",
@@ -92,6 +99,8 @@ export function registerMathlive(runtime: Runtime) {
             return true;
           },
         });
+
+        // TODO: Fix alt+enter
 
         editor.value = this.cell.textContent;
 

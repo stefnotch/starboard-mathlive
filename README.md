@@ -10,11 +10,11 @@ focused cell
 
 localstorage backup
 
-todo: use this for solving a maths exercise
+todo: use this for solving a maths exercise  
 todo: alternative smart superscript: typing a plus or minus should jump out of the superscript  
 todo: mathlive should automatically place/make big brackets  
-todo: mathlive highlighting behaviour?
-todo: don't bother with pyodide for now, instead focus on putting the maths editor on steroids
+todo: mathlive highlighting behaviour?  
+todo: don't bother with pyodide for now, instead focus on putting the maths editor on steroids  
 
 Import/export plugin
 https://discord.com/channels/818559380827144253/818559381398487052/838187388362424331

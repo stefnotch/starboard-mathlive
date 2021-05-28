@@ -93,8 +93,14 @@ function serializeCell(cell) {
 
 // Note: Doesn't serialize any cell or notebook metadata
 function serializeAsMarkdown() {
-  const md = runtime.content.cells.filter((c,i) => i >= 2).map(c => serializeCell(c)).join("\n")
+  const md = runtime.content.cells.filter((c,i) => i >= 2).map(c => serializeCell(c)).join("  \n")
   outputEl.innerText = md;
+
+  navigator.clipboard.writeText(md).then(function() {
+    /* clipboard successfully set */
+  }, function() {
+    /* clipboard write failed */
+  });
 }
 
 html`

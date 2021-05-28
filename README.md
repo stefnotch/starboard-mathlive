@@ -37,8 +37,5 @@ Some quick shortcut/typing to insert a new cell type??
 `js`: the search thingy is searching for js and suggests the Javascript cell type  
 `Enter`: Inserts the Javascript cell
 
-
-Bugger Starboard creator about relative plugin paths
-
 We can probably avoid shipping the KaTeX fonts (because starboard depends on KaTeX)
 

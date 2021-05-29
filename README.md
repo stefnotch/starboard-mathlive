@@ -16,6 +16,11 @@ todo: alternative smart superscript: typing a plus or minus should jump out of t
 todo: mathlive should automatically place/make big brackets  
 todo: mathlive highlighting behaviour?  
 todo: don't bother with pyodide for now, instead focus on putting the maths editor on steroids  
+todo: 
+> Expression prediction or just plain old autocomplete is something I'd be quite interested in. However, it might be pretty hard to cover 'everything', so, it would probably be a good idea to make it configurable.
+> My use cases would be things like `lim n` and then the autocomplete suggesting `lim n -> infinity`.
+
+
 
 Import/export plugin
 https://discord.com/channels/818559380827144253/818559381398487052/838187388362424331

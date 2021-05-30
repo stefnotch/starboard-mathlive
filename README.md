@@ -8,8 +8,6 @@ Undo and redo support for deleting/adding cells
 
 focused cell
 
-localstorage backup
-
 todo: mathlive right click context menu for copy as latex/ascii/...   
 todo: use this for solving a maths exercise  
 todo: alternative smart superscript: typing a plus or minus should jump out of the superscript  
@@ -43,5 +41,8 @@ Some quick shortcut/typing to insert a new cell type??
 `js`: the search thingy is searching for js and suggests the Javascript cell type  
 `Enter`: Inserts the Javascript cell
 
-We can probably avoid shipping the KaTeX fonts (because starboard depends on KaTeX)
+use starboard-wrap for the demo
 
+[native filesystem](https://web.dev/file-system-access/), including opening an entire directory
+
+We can probably avoid shipping the KaTeX fonts (because starboard depends on KaTeX)

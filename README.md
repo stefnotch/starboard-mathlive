@@ -10,8 +10,6 @@ focused cell
 
 todo: mathlive right click context menu for copy as latex/ascii/...   
 todo: use this for solving a maths exercise  
-todo: alternative smart superscript: typing a plus or minus should jump out of the superscript  
-todo: mathlive should automatically place/make big brackets  
 todo: mathlive highlighting behaviour?  
 todo: don't bother with pyodide for now, instead focus on putting the maths editor on steroids  
 todo: 

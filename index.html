@@ -7,6 +7,15 @@
     href="https://unpkg.com/starboard-notebook@0.10.1/dist/starboard-notebook.css"
     rel="stylesheet"
   />
+  <script>
+    // Localstorage hack (so that you can load a notebook & reload the page)
+    const notebookContent = localStorage.getItem("initial-notebook");
+    console.log(notebookContent);
+    if (notebookContent) {
+      localStorage.removeItem("initial-notebook");
+      window.initialNotebookContent = notebookContent;
+    }
+  </script>
   <script
     src="https://unpkg.com/starboard-notebook@0.10.1/dist/starboard-notebook.js"
     defer
@@ -72,6 +81,44 @@ if(getMode() === "release") {
     runtime.controls.registerPlugin(result.plugin, {})
   });
 }
+
+# %%--- [javascript]
+# properties:
+#   run_on_load: true
+#   top_hidden: true
+# ---%%
+// TODO: use the cooler native filesystem API if possible
+
+function loadNotebook(event) {
+  let files = event.target.files;
+  if(files.length > 0) {
+    const reader = new FileReader();
+    reader.onload = event => {
+      localStorage.setItem("initial-notebook", event.target.result);
+      location.reload();
+    };
+    reader.onerror = error => reject(error);
+    reader.readAsText(files[0], "UTF-8");
+  }
+}
+
+function saveNotebook() {
+  let content = runtime.exports.core.notebookContentToText(runtime.content);
+  let aElement = document.createElement('a');
+  let filename = "notebook.nb";
+  let file = new File([content], filename, {type: "text/plain"});
+  aElement.href = window.URL.createObjectURL(file);
+  aElement.download = filename;
+  aElement.style.display = "none";
+  //document.body.appendChild(aElement);
+  aElement.click();
+  //document.body.removeChild(aElement);
+}
+
+html`
+  <button class="btn btn-primary m-2" @click="${saveNotebook}">Save</button>
+  <input type="file" class="btn btn-primary m-2" @change="${loadNotebook}">
+`
 
 # %%--- [javascript]
 # properties:

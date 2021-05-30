@@ -27,13 +27,11 @@ https://github.com/gzuidhof/starboard-notebook/issues/2
 
 Pyodide web worker/shared worker (comlink?)
 
-Better UI
+Starboard UI improvements :thinking: (like the add cell button location, especially with an empty notebook)
 
 Notebook in URL :thinking:
 
-https://caniuse.com/async-clipboard
-
-publish to npm and publish to github pages
+publish to npm
 
 Some quick shortcut/typing to insert a new cell type??
 

@@ -103,6 +103,7 @@ export function registerMathlive(runtime: Runtime) {
         // TODO: Fix alt+enter
 
         editor.value = this.cell.textContent;
+        editor.style.fontSize = "18px";
 
         // TODO: Turn off the accessible part? Or at least hide the errors?
         // `mathfield.accessibleNode.innerHTML = mathfield.options.createHTML(`

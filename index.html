@@ -10,11 +10,26 @@
   <script>
     // Localstorage hack (so that you can load a notebook & reload the page)
     const notebookContent = localStorage.getItem("initial-notebook");
-    console.log(notebookContent);
     if (notebookContent) {
       localStorage.removeItem("initial-notebook");
       window.initialNotebookContent = notebookContent;
     }
+
+    // Unsaved changes hack
+    let hasBeforeUnload = false;
+    window.parentIFrame = {
+      sendMessage: function (message, targetOrigin) {
+        if (message?.type === "NOTEBOOK_CONTENT_UPDATE") {
+          if (!hasBeforeUnload) {
+            window.addEventListener("beforeunload", function (event) {
+              event.preventDefault();
+              event.returnValue = "Unsaved Changes";
+            });
+            hasBeforeUnload = true;
+          }
+        }
+      },
+    };
   </script>
   <script
     src="https://unpkg.com/starboard-notebook@0.10.1/dist/starboard-notebook.js"

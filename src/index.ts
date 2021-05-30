@@ -69,7 +69,7 @@ export function registerMathlive(runtime: Runtime) {
       mathlivePromise.then((ml) => {
         const editor = new ml.MathfieldElement({
           defaultMode: "math",
-          smartSuperscript: true,
+          // smartSuperscript: true,
           removeExtraneousParentheses: true,
           smartFence: true,
           plonkSound: null as any,

@@ -9,8 +9,6 @@ import {
   Cell,
   StarboardPlugin,
 } from "starboard-notebook/dist/src/types";
-import { html, render } from "lit";
-import { unsafeHTML } from "lit/directives/unsafe-html";
 import { Runtime } from "starboard-notebook/dist/src/types";
 import type { MathfieldElement } from "mathlive";
 
@@ -33,8 +31,75 @@ export function registerMathlive(runtime: Runtime) {
   math-field {
     transition: outline 0.2s ease-in-out;
   }
+  .mathlive-dropdown-menu {
+    position: fixed;
+    z-index: 1000;
+    display: none;
+    padding: .5rem 1rem;
+    margin: 0;
+    font-size: 1rem;
+    color: #212529;
+    text-align: left;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid rgba(0,0,0,.15);
+    border-radius: var(--border-radius);
+  }
+  .mathlive-dropdown-menu li:hover {
+    cursor: pointer;
+  }
+  .mathlive-dropdown-menu.show {
+    display: block;
+  }
+  .mathlive-dropdown-menu ul {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
   </style>`
   );
+
+  // Context menu with focusable entries
+  // https://itnext.io/how-to-create-a-custom-right-click-menu-with-javascript-9c368bb58724
+  // https://stackoverflow.com/questions/152975/how-do-i-detect-a-click-outside-an-element
+  const contextMenu = document.createElement("div");
+  contextMenu.classList.add("mathlive-dropdown-menu");
+  contextMenu.style.minWidth = "244px";
+  let contextMenuCloseTimeout: number | null = null;
+  contextMenu.addEventListener("focusin", (ev) => {
+    if (contextMenuCloseTimeout !== null) clearTimeout(contextMenuCloseTimeout);
+  });
+  contextMenu.addEventListener("focusout", (ev) => {
+    contextMenuCloseTimeout = setTimeout(
+      (() => {
+        contextMenu.classList.remove("show");
+      }) as TimerHandler,
+      0
+    );
+  });
+  contextMenu.addEventListener("keydown", (ev) => {
+    if (ev.key === "Escape") {
+      contextMenu.classList.remove("show");
+    }
+  });
+  lit.render(
+    lit.html`<ul>
+  <li><h6 class="dropdown-header">Copy as</h6></li>
+  <li class="first-focusable dropdown-item" tabindex="0">
+    <button
+      title="Cat"
+      class="dropdown-item${"active"}"
+      @click=${() => {}}
+    >
+     cattto <span
+        style="opacity: 0.6; float: right; font-size: 11px; font-family: var(--font-mono)"
+        >Cat</span>
+    </button>
+  </li>
+</ul>`,
+    contextMenu
+  );
+  document.body.appendChild(contextMenu);
 
   const MATHLIVE_CELL_TYPE_DEFINITION: CellTypeDefinition = {
     name: "Mathlive",
@@ -93,13 +158,29 @@ export function registerMathlive(runtime: Runtime) {
         });
 
         editor.addEventListener("pointerup", (ev) => {
-          // TODO: Show context menu
-          // https://itnext.io/how-to-create-a-custom-right-click-menu-with-javascript-9c368bb58724
-          // Check what starboard does for some of the popup menus
-          // editor.getValue(editor.selection, )
+          if (ev.button === 2) {
+            // TODO: Show context menu
+            // https://itnext.io/how-to-create-a-custom-right-click-menu-with-javascript-9c368bb58724
+            // Check what starboard does for some of the popup menus
+            // editor.getValue(editor.selection, )
+            contextMenu.classList.remove("show");
+
+            contextMenu.style.left = ev.clientX + "px";
+            contextMenu.style.top = ev.clientY + "px";
+
+            setTimeout(() => {
+              contextMenu.classList.add("show");
+              contextMenu
+                .querySelector<HTMLElement>(".first-focusable")
+                ?.focus();
+            });
+          }
         });
 
-        editor.addEventListener("contextmenu", (e) => e.preventDefault());
+        editor.addEventListener("contextmenu", (e) => {
+          e.preventDefault();
+          return false;
+        });
 
         // TODO: Fix alt+enter
 

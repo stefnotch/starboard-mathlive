@@ -30,6 +30,13 @@
         }
       },
     };
+
+    // Context menu hack (prevent the terrible matplotlib hack)
+    const _addEventListener = window.addEventListener;
+    window.addEventListener = function (eventType, listener, ...args) {
+      if (eventType === "contextmenu") return;
+      return _addEventListener.call(this, eventType, listener, ...args);
+    };
   </script>
   <script
     src="https://unpkg.com/starboard-notebook@0.10.1/dist/starboard-notebook.js"

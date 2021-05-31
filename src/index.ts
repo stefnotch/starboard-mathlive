@@ -38,7 +38,7 @@ export function registerMathlive(runtime: Runtime) {
 
   const MATHLIVE_CELL_TYPE_DEFINITION: CellTypeDefinition = {
     name: "Mathlive",
-    cellType: ["mathlive", "math"],
+    cellType: ["mathlive"],
     createHandler: (cell: Cell, runtime: Runtime) =>
       new MathLiveCellHandler(cell, runtime),
   };
@@ -47,24 +47,16 @@ export function registerMathlive(runtime: Runtime) {
     private elements!: CellElements;
     private editor?: MathfieldElement;
 
-    private changeListener: () => any;
-
     cell: Cell;
     runtime: Runtime;
 
     constructor(cell: Cell, runtime: Runtime) {
-      this.changeListener = () => this.run();
       this.cell = cell;
       this.runtime = runtime;
     }
 
-    clear(): void {
-      // Nothing to clear, so eh
-    }
-
     attach(params: CellHandlerAttachParameters) {
       this.elements = params.elements;
-
       // TODO: More of this stuff https://github.com/stefnotch/quantum-sheet/blob/master/src/ui/elements/ExpressionElement.vue
       mathlivePromise.then((ml) => {
         const editor = new ml.MathfieldElement({
@@ -78,7 +70,7 @@ export function registerMathlive(runtime: Runtime) {
             this.cell.textContent = mf.getValue("latex");
           },
           onCommit: (mf) => {
-            // TODO: Ask the CAS
+            this.run();
           },
           onMoveOutOf: (mf, direction) => {
             if (direction === "upward" || direction === "backward") {
@@ -100,33 +92,38 @@ export function registerMathlive(runtime: Runtime) {
           },
         });
 
+        editor.addEventListener("pointerup", (ev) => {
+          // TODO: Show context menu
+          // https://itnext.io/how-to-create-a-custom-right-click-menu-with-javascript-9c368bb58724
+          // Check what starboard does for some of the popup menus
+          // editor.getValue(editor.selection, )
+        });
+
+        editor.addEventListener("contextmenu", (e) => e.preventDefault());
+
         // TODO: Fix alt+enter
 
         editor.value = this.cell.textContent;
         editor.style.fontSize = "18px";
 
+        // Later down the road we can use "adoptedStyleSheets"
+        const caretCustomStyle = document.createElement("style");
+        caretCustomStyle.innerHTML = `.ML__caret:after {
+          border-right-width: 0px !important;
+          margin-right: 0px !important;
+          width: 0px !important;
+          box-shadow: 0px 0px 0px 1px var(--caret,hsl(var(--hue,212),40%,49%));
+         }`;
+        editor.shadowRoot?.appendChild?.(caretCustomStyle);
+
         // TODO: Turn off the accessible part? Or at least hide the errors?
         // `mathfield.accessibleNode.innerHTML = mathfield.options.createHTML(`
+
+        // editor._mathfield.model.getValue could be overriden/wrapped to tweak the copying
 
         this.editor = editor;
         this.elements.topElement.appendChild(editor);
       });
-
-      this.runtime.controls.subscribeToCellChanges(
-        this.cell.id,
-        this.changeListener
-      );
-      this.run();
-    }
-
-    async run() {
-      const content = this.cell.textContent;
-      /*if (content) {
-        render(
-          html`${unsafeHTML("\n" + content + "\n")}`,
-          this.elements.bottomElement
-        );
-      }*/
     }
 
     focusEditor() {
@@ -134,15 +131,19 @@ export function registerMathlive(runtime: Runtime) {
       this.editor?.executeCommand?.("moveToMathFieldStart");
     }
 
+    async run() {
+      // TODO: Ask the CAS
+    }
+
+    clear(): void {
+      // Nothing to to do, so eh
+    }
+
     async dispose() {
       const editor = this.editor;
       if (editor) {
         this.elements.topElement.removeChild(editor);
       }
-      this.runtime.controls.unsubscribeToCellChanges(
-        this.cell.id,
-        this.changeListener
-      );
     }
   }
 

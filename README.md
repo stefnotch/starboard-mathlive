@@ -17,6 +17,7 @@ todo:
 > My use cases would be things like `lim n` and then the autocomplete suggesting `lim n -> infinity`.
 
 
+advertise mathlive (+mathjson) and starboard
 
 Import/export plugin
 https://discord.com/channels/818559380827144253/818559381398487052/838187388362424331

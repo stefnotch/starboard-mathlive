@@ -11,59 +11,47 @@ import {
 } from "starboard-notebook/dist/src/types";
 import { Runtime } from "starboard-notebook/dist/src/types";
 import type { MathfieldElement } from "mathlive";
+import type Lit from "lit";
 
 const mathlivePromise = import("mathlive");
 
-export function registerMathlive(runtime: Runtime) {
-  /* These globals are exposed by Starboard Notebook. We can re-use them so we don't have to bundle them again. */
-  const lit = runtime.exports.libraries.lit;
-
-  const StarboardTextEditor = runtime.exports.elements.StarboardTextEditor;
-  const cellControlsTemplate = runtime.exports.templates.cellControls;
-
-  document.head.insertAdjacentHTML(
-    "beforeend",
-    `<style>math-field:hover,
-  math-field:focus,
-  math-field:focus-within {
-    outline: var(--border-color-secondary) auto 1px;
-  }
-  math-field {
-    transition: outline 0.2s ease-in-out;
-  }
-  .mathlive-dropdown-menu {
-    position: fixed;
-    z-index: 1000;
-    display: none;
-    padding: .5rem 1rem;
-    margin: 0;
-    font-size: 1rem;
-    color: #212529;
-    text-align: left;
-    background-color: #fff;
-    background-clip: padding-box;
-    border: 1px solid rgba(0,0,0,.15);
-    border-radius: var(--border-radius);
-  }
-  .mathlive-dropdown-menu li:hover {
-    cursor: pointer;
-  }
-  .mathlive-dropdown-menu.show {
-    display: block;
-  }
-  .mathlive-dropdown-menu ul {
-    padding: 0;
-    margin: 0;
-    list-style: none;
-  }
-  </style>`
-  );
+function useContextMenu(lit: typeof Lit) {
+  const styles = `
+.mathlive-context-menu {
+  position: fixed;
+  z-index: 1000;
+  display: none;
+  padding: .5rem 1rem;
+  margin: 0;
+  font-size: 1rem;
+  color: #212529;
+  text-align: left;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 1px solid rgba(0,0,0,.15);
+  border-radius: var(--border-radius);
+  opacity: 1;
+}
+.mathlive-context-menu .dropdown-item:hover {
+  cursor: pointer;
+}
+.mathlive-context-menu.show {
+  display: block;
+}
+.mathlive-context-menu.transparent {
+  opacity: 0;
+}
+.mathlive-context-menu ul {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}`;
 
   // Context menu with focusable entries
   // https://itnext.io/how-to-create-a-custom-right-click-menu-with-javascript-9c368bb58724
   // https://stackoverflow.com/questions/152975/how-do-i-detect-a-click-outside-an-element
   const contextMenu = document.createElement("div");
-  contextMenu.classList.add("mathlive-dropdown-menu");
+  contextMenu.classList.add("mathlive-context-menu");
   contextMenu.style.minWidth = "244px";
   let contextMenuCloseTimeout: number | null = null;
   contextMenu.addEventListener("focusin", (ev) => {
@@ -99,6 +87,61 @@ export function registerMathlive(runtime: Runtime) {
 </ul>`,
     contextMenu
   );
+
+  function showContextMenu(opts: { x: number; y: number }) {
+    // TODO: Show context menu
+    // https://itnext.io/how-to-create-a-custom-right-click-menu-with-javascript-9c368bb58724
+    // Check what starboard does for some of the popup menus
+    // editor.getValue(editor.selection, )
+    contextMenu.classList.add("transparent");
+    contextMenu.classList.add("show");
+
+    const boundingRect = contextMenu.getBoundingClientRect();
+
+    // document.documentElement.clientHeight
+    if (opts.x + boundingRect.width <= document.documentElement.clientWidth) {
+      contextMenu.style.left = opts.x + "px";
+    } else {
+      contextMenu.style.left =
+        document.documentElement.clientWidth - boundingRect.width + "px";
+    }
+    contextMenu.style.top = opts.y + "px";
+
+    setTimeout(() => {
+      contextMenu.classList.remove("transparent");
+      contextMenu.querySelector<HTMLElement>(".first-focusable")?.focus();
+    });
+  }
+  return { styles, contextMenu, showContextMenu };
+}
+
+export function registerMathlive(runtime: Runtime) {
+  /* These globals are exposed by Starboard Notebook. We can re-use them so we don't have to bundle them again. */
+  const lit = runtime.exports.libraries.lit;
+
+  const StarboardTextEditor = runtime.exports.elements.StarboardTextEditor;
+  const cellControlsTemplate = runtime.exports.templates.cellControls;
+
+  const {
+    styles: contextMenuStyles,
+    contextMenu,
+    showContextMenu,
+  } = useContextMenu(lit);
+
+  document.head.insertAdjacentHTML(
+    "beforeend",
+    `<style>math-field:hover,
+  math-field:focus,
+  math-field:focus-within {
+    outline: var(--border-color-secondary) auto 1px;
+  }
+  math-field {
+    transition: outline 0.2s ease-in-out;
+  }
+  ${contextMenuStyles}
+  </style>`
+  );
+
   document.body.appendChild(contextMenu);
 
   const MATHLIVE_CELL_TYPE_DEFINITION: CellTypeDefinition = {
@@ -159,20 +202,9 @@ export function registerMathlive(runtime: Runtime) {
 
         editor.addEventListener("pointerup", (ev) => {
           if (ev.button === 2) {
-            // TODO: Show context menu
-            // https://itnext.io/how-to-create-a-custom-right-click-menu-with-javascript-9c368bb58724
-            // Check what starboard does for some of the popup menus
-            // editor.getValue(editor.selection, )
-            contextMenu.classList.remove("show");
-
-            contextMenu.style.left = ev.clientX + "px";
-            contextMenu.style.top = ev.clientY + "px";
-
-            setTimeout(() => {
-              contextMenu.classList.add("show");
-              contextMenu
-                .querySelector<HTMLElement>(".first-focusable")
-                ?.focus();
+            showContextMenu({
+              x: ev.clientX,
+              y: ev.clientY,
             });
           }
         });
@@ -196,9 +228,6 @@ export function registerMathlive(runtime: Runtime) {
           box-shadow: 0px 0px 0px 1px var(--caret,hsl(var(--hue,212),40%,49%));
          }`;
         editor.shadowRoot?.appendChild?.(caretCustomStyle);
-
-        // TODO: Turn off the accessible part? Or at least hide the errors?
-        // `mathfield.accessibleNode.innerHTML = mathfield.options.createHTML(`
 
         // editor._mathfield.model.getValue could be overriden/wrapped to tweak the copying
 

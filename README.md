@@ -13,6 +13,8 @@ Fix alt+enter
 todo: use this for solving a maths exercise  
 todo: mathlive highlighting behaviour?  
 todo: don't bother with pyodide for now, instead focus on putting the maths editor on steroids  
+todo: is getting 'stuck' in text mode a bug `\R[enter]\[backspace]`?
+todo: should latex mode optionally get exited when the user hits the space bar?
 todo: 
 > Expression prediction or just plain old autocomplete is something I'd be quite interested in. However, it might be pretty hard to cover 'everything', so, it would probably be a good idea to make it configurable.
 > My use cases would be things like `lim n` and then the autocomplete suggesting `lim n -> infinity`.

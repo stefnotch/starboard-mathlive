@@ -8,8 +8,6 @@ Undo and redo support for deleting/adding cells
 
 focused cell
 
-Fix alt+enter
-
 todo: use this for solving a maths exercise  
 todo: mathlive highlighting behaviour?  
 todo: don't bother with pyodide for now, instead focus on putting the maths editor on steroids  

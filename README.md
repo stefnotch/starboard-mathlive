@@ -6,7 +6,8 @@ Mathlive in a starboard notebook! View it in action [here](https://stefnotch.git
 
 Undo and redo support for deleting/adding cells
 
-focused cell
+Sweet, would `Backspace` or `Ctrl`+`Backspace` (or something else) be preferable as a shortcut to delete empty cells? Or does it really not matter?
+Regarding implementing it, when the user hits the key, the text editor would check if `this.cell.textContent` is empty and then it'd emit the `REMOVE_CELL` event.
 
 todo: use this for solving a maths exercise  
 todo: mathlive highlighting behaviour?  
@@ -24,9 +25,9 @@ look at https://www.symbolab.com/ , since it does some useful things
 advertise mathlive (+mathjson) and starboard
 
 Import/export plugin
-https://discord.com/channels/818559380827144253/818559381398487052/838187388362424331
-https://starboard.gg/gz/custom-serialization-nNFrigs
-https://github.com/gzuidhof/starboard-notebook/issues/2
+https://discord.com/channels/818559380827144253/818559381398487052/838187388362424331 
+https://starboard.gg/gz/custom-serialization-nNFrigs 
+https://github.com/gzuidhof/starboard-notebook/issues/2 
 
 Pyodide web worker/shared worker (comlink?)
 

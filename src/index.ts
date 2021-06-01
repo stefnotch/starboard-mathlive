@@ -12,6 +12,7 @@ import {
 import { Runtime } from "starboard-notebook/dist/src/types";
 import type { MathfieldElement } from "mathlive";
 import type Lit from "lit";
+import { OutputFormat } from "mathlive/dist/public/mathfield";
 
 const mathlivePromise = import("mathlive");
 
@@ -21,7 +22,7 @@ function useContextMenu(lit: typeof Lit) {
   position: fixed;
   z-index: 1000;
   display: none;
-  padding: .5rem 1rem;
+  padding: 0px;
   margin: 0;
   font-size: 1rem;
   color: #212529;
@@ -31,9 +32,6 @@ function useContextMenu(lit: typeof Lit) {
   border: 1px solid rgba(0,0,0,.15);
   border-radius: var(--border-radius);
   opacity: 1;
-}
-.mathlive-context-menu .dropdown-item:hover {
-  cursor: pointer;
 }
 .mathlive-context-menu.show {
   display: block;
@@ -45,7 +43,33 @@ function useContextMenu(lit: typeof Lit) {
   padding: 0;
   margin: 0;
   list-style: none;
-}`;
+}
+.mathlive-context-menu li {
+  padding: 0px;
+  margin: 0px;
+}
+.mathlive-context-menu .context-menu-header {
+  display: block;
+  margin-bottom: 0;
+  font-size: .875rem;
+  color: #6c757d;
+  white-space: nowrap;
+  padding: .5rem 1rem;
+}
+.mathlive-context-menu .context-menu-button {
+  display: block;
+  width: 100%;
+  margin: 0px;
+  padding: .25rem 1rem;
+  text-align: start;
+  background: initial;
+  border: 0px;
+}
+.mathlive-context-menu .context-menu-button:hover {
+  cursor: pointer;
+  background: #e9ecef;
+}
+`;
 
   // Context menu with focusable entries
   // https://itnext.io/how-to-create-a-custom-right-click-menu-with-javascript-9c368bb58724
@@ -53,6 +77,9 @@ function useContextMenu(lit: typeof Lit) {
   const contextMenu = document.createElement("div");
   contextMenu.classList.add("mathlive-context-menu");
   contextMenu.style.minWidth = "244px";
+
+  let copyCallback = (type: OutputFormat) => {};
+
   let contextMenuCloseTimeout: number | null = null;
   contextMenu.addEventListener("focusin", (ev) => {
     if (contextMenuCloseTimeout !== null) clearTimeout(contextMenuCloseTimeout);
@@ -70,29 +97,75 @@ function useContextMenu(lit: typeof Lit) {
       contextMenu.classList.remove("show");
     }
   });
+
   lit.render(
     lit.html`<ul>
-  <li><h6 class="dropdown-header">Copy as</h6></li>
-  <li class="first-focusable dropdown-item" tabindex="0">
+  <li><h6 class="context-menu-header">Copy as</h6></li>
+  <li>
     <button
-      title="Cat"
-      class="dropdown-item${"active"}"
-      @click=${() => {}}
+      title="Kinky"
+      class="context-menu-button first-focusable"
+      tabindex="0"
+      @click=${() => {
+        copyCallback("latex");
+        contextMenu.classList.remove("show");
+      }}
     >
-     cattto <span
-        style="opacity: 0.6; float: right; font-size: 11px; font-family: var(--font-mono)"
-        >Cat</span>
+     Latex
+    </button>
+  </li>
+  <li>
+    <button
+      title="Latex Expanded"
+      class="context-menu-button" 
+      tabindex="0"
+      @click=${() => {
+        copyCallback("latex-expanded");
+        contextMenu.classList.remove("show");
+      }}
+    >
+     Latex Expanded
+    </button>
+  </li>
+  <li>
+    <button
+      title="Asciimath"
+      class="context-menu-button" 
+      tabindex="0"
+      @click=${() => {
+        copyCallback("ascii-math");
+        contextMenu.classList.remove("show");
+      }}
+    >
+    Asciimath
+    </button>
+  </li>
+  <li>
+    <button
+      title="MathJson"
+      class="context-menu-button" 
+      tabindex="0"
+      @click=${() => {
+        copyCallback("math-json");
+        contextMenu.classList.remove("show");
+      }}
+    >
+    MathJson
     </button>
   </li>
 </ul>`,
     contextMenu
   );
 
-  function showContextMenu(opts: { x: number; y: number }) {
-    // TODO: Show context menu
+  function showContextMenu(opts: {
+    x: number;
+    y: number;
+    copyCallback: (type: OutputFormat) => void;
+  }) {
     // https://itnext.io/how-to-create-a-custom-right-click-menu-with-javascript-9c368bb58724
     // Check what starboard does for some of the popup menus
-    // editor.getValue(editor.selection, )
+    copyCallback = opts.copyCallback;
+
     contextMenu.classList.add("transparent");
     contextMenu.classList.add("show");
 
@@ -205,6 +278,23 @@ export function registerMathlive(runtime: Runtime) {
             showContextMenu({
               x: ev.clientX,
               y: ev.clientY,
+              copyCallback: function (type: OutputFormat) {
+                let isSelectionNone = editor.selection.ranges.every(
+                  (range) => range[0] === range[1]
+                );
+
+                const selectedText = isSelectionNone
+                  ? editor.getValue(type)
+                  : editor.getValue(editor.selection, type);
+                navigator.clipboard.writeText(selectedText + "").then(
+                  function () {
+                    console.log("Copied to clipboard");
+                  },
+                  function (e) {
+                    console.log("Failed to copy to clipboard", e);
+                  }
+                );
+              },
             });
           }
         });

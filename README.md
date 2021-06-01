@@ -15,6 +15,7 @@ todo: mathlive highlighting behaviour?
 todo: don't bother with pyodide for now, instead focus on putting the maths editor on steroids  
 todo: is getting 'stuck' in text mode a bug `\R[enter]\[backspace]`?  
 todo: should latex mode optionally get exited when the user hits the space bar?  
+todo: can I tweak the behaviour of ctrl+c https://github.com/arnog/mathlive/blob/cff2fccb01964c115592f21fc67b9847c7990c48/src/editor-mathfield/mode-editor.ts#L9-L10  
 todo: 
 > Expression prediction or just plain old autocomplete is something I'd be quite interested in. However, it might be pretty hard to cover 'everything', so, it would probably be a good idea to make it configurable.
 > My use cases would be things like `lim n` and then the autocomplete suggesting `lim n -> infinity`.

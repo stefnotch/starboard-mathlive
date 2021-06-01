@@ -8,7 +8,6 @@ Undo and redo support for deleting/adding cells
 
 focused cell
 
-todo: mathlive right click context menu for copy as latex/ascii/...   
 todo: use this for solving a maths exercise  
 todo: mathlive highlighting behaviour?  
 todo: don't bother with pyodide for now, instead focus on putting the maths editor on steroids  

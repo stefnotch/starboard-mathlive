@@ -16,7 +16,9 @@ todo: don't bother with pyodide for now, instead focus on putting the maths edit
 todo: 
 > Expression prediction or just plain old autocomplete is something I'd be quite interested in. However, it might be pretty hard to cover 'everything', so, it would probably be a good idea to make it configurable.
 > My use cases would be things like `lim n` and then the autocomplete suggesting `lim n -> infinity`.
+> Or autocompleting according to what was written in the previous line
 
+look at https://www.symbolab.com/ , since it does some useful things
 
 advertise mathlive (+mathjson) and starboard
 

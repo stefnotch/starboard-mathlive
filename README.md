@@ -12,7 +12,7 @@ Regarding implementing it, when the user hits the key, the text editor would che
 todo: use this for solving a maths exercise  
 todo: mathlive highlighting behaviour?  
 todo: don't bother with pyodide for now, instead focus on putting the maths editor on steroids  
-todo: is getting 'stuck' in text mode a bug `\R[enter]\[backspace]`?  
+todo: is getting 'stuck' in latex mode a bug `\R[enter]\[backspace]`? (maybe I should add some indicator for that mode? like 'hit esc to exit')  
 todo: should latex mode optionally get exited when the user hits the space bar?  
 todo: can I tweak the behaviour of ctrl+c https://github.com/arnog/mathlive/blob/cff2fccb01964c115592f21fc67b9847c7990c48/src/editor-mathfield/mode-editor.ts#L9-L10  
 todo: 

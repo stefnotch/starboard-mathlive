@@ -4,6 +4,20 @@ Mathlive in a starboard notebook! View it in action [here](https://stefnotch.git
 
 ## TODO: Starboard stuff
 
+
+Some quick shortcut/typing to insert a new cell type??
+
+`Shift`+`Enter` at the last line: focuses the create cell button  
+`js`: the search thingy is searching for js and suggests the Javascript cell type  
+`Enter`: Inserts the Javascript cell
+
+use starboard-wrap for the demo
+
+[native filesystem](https://web.dev/file-system-access/), including opening an entire directory (persist in indexeddb and use this library https://web.dev/browser-fs-access/ )
+
+
+
+
 Undo and redo support for deleting/adding cells
 
 Sweet, would `Backspace` or `Ctrl`+`Backspace` (or something else) be preferable as a shortcut to delete empty cells? Or does it really not matter?
@@ -36,15 +50,5 @@ Starboard UI improvements :thinking: (like the add cell button location, especia
 Notebook in URL :thinking:
 
 publish to npm
-
-Some quick shortcut/typing to insert a new cell type??
-
-`Shift`+`Enter` at the last line: focuses the create cell button  
-`js`: the search thingy is searching for js and suggests the Javascript cell type  
-`Enter`: Inserts the Javascript cell
-
-use starboard-wrap for the demo
-
-[native filesystem](https://web.dev/file-system-access/), including opening an entire directory (persist in indexeddb and use this library https://web.dev/browser-fs-access/ )
 
 We can probably avoid shipping the KaTeX fonts (because starboard depends on KaTeX)

@@ -20,7 +20,7 @@ use starboard-wrap for the demo
 
 Undo and redo support for deleting/adding cells
 
-todo: Why can you have a codemirror editor above a monaco editor? how?
+todo: Why can you have a codemirror editor above a monaco editor? how?  
 todo: use this for solving a maths exercise  
 todo: mathlive highlighting behaviour?  
 todo: don't bother with pyodide for now, instead focus on putting the maths editor on steroids  

@@ -254,19 +254,25 @@ export function registerMathlive(runtime: Runtime) {
             this.run();
           },
           onMoveOutOf: (mf, direction) => {
-            if (direction === "upward" || direction === "backward") {
+            if (direction === "upward") {
               this.runtime.controls.emit({
                 type: "FOCUS_CELL",
                 id: this.cell.id,
                 focus: "previous",
               });
               return false;
-            } else if (direction === "downward" || direction === "forward") {
+            } else if (direction === "downward") {
               this.runtime.controls.emit({
                 type: "FOCUS_CELL",
                 id: this.cell.id,
                 focus: "next",
               });
+              return false;
+            } else if (direction === "backward") {
+              editor.executeCommand("moveToMathFieldEnd");
+              return false;
+            } else if (direction === "forward") {
+              editor.executeCommand("moveToMathFieldStart");
               return false;
             }
             return true;
@@ -304,10 +310,10 @@ export function registerMathlive(runtime: Runtime) {
           return false;
         });
 
-        // TODO: Fix alt+enter
-
         editor.value = this.cell.textContent;
         editor.style.fontSize = "18px";
+
+        // TODO: Set caret according to viewport coordinates in the next mathfield
 
         // Later down the road we can use "adoptedStyleSheets"
         const caretCustomStyle = document.createElement("style");
@@ -318,8 +324,6 @@ export function registerMathlive(runtime: Runtime) {
           box-shadow: 0px 0px 0px 1px var(--caret,hsl(var(--hue,212),40%,49%));
          }`;
         editor.shadowRoot?.appendChild?.(caretCustomStyle);
-
-        // editor._mathfield.model.getValue could be overriden/wrapped to tweak the copying
 
         this.editor = editor;
         this.elements.topElement.appendChild(editor);

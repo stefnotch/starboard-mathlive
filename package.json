@@ -48,6 +48,6 @@
     "typescript": "^4.3.2"
   },
   "dependencies": {
-    "mathlive": "^0.68.1"
+    "mathlive": "^0.67.0"
   }
 }

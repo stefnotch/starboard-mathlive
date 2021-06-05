@@ -32,6 +32,8 @@ todo:
 > My use cases would be things like `lim n` and then the autocomplete suggesting `lim n -> infinity`.
 > Or autocompleting according to what was written in the previous line
 
+todo: autoalign? As in x = a = b = c = d in an aligned environment with the equals signs below each other
+
 look at https://www.symbolab.com/ , since it does some useful things
 
 advertise mathlive (+mathjson) and starboard

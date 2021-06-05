@@ -16,6 +16,9 @@ import { OutputFormat } from "mathlive/dist/public/mathfield";
 
 const mathlivePromise = import("mathlive");
 
+let previouslyFocusedCell: string | null = null;
+let previousCaretPoint: { x: number; y: number } | null = null;
+
 function useContextMenu(lit: typeof Lit) {
   const styles = `
 .mathlive-context-menu {
@@ -260,6 +263,8 @@ export function registerMathlive(runtime: Runtime) {
                 id: this.cell.id,
                 focus: "previous",
               });
+              previouslyFocusedCell = this.cell.id;
+              previousCaretPoint = editor.caretPoint;
               return false;
             } else if (direction === "downward") {
               this.runtime.controls.emit({
@@ -267,6 +272,8 @@ export function registerMathlive(runtime: Runtime) {
                 id: this.cell.id,
                 focus: "next",
               });
+              previouslyFocusedCell = this.cell.id;
+              previousCaretPoint = editor.caretPoint;
               return false;
             } else if (direction === "backward") {
               editor.executeCommand("moveToMathFieldEnd");
@@ -330,9 +337,37 @@ export function registerMathlive(runtime: Runtime) {
       });
     }
 
-    focusEditor() {
+    focusEditor(opts: { position?: "start" | "end" }) {
       this.editor?.focus?.();
       this.editor?.executeCommand?.("moveToMathFieldStart");
+
+      const editor = this.editor;
+      if (
+        previouslyFocusedCell != null &&
+        previousCaretPoint != null &&
+        editor != null
+      ) {
+        let previousIndex = this.runtime.content.cells.findIndex(
+          (c) => previouslyFocusedCell === c.id
+        );
+        let thisIndex = this.runtime.content.cells.findIndex(
+          (c) => this.cell.id === c.id
+        );
+        if (
+          previousIndex >= 0 &&
+          (previousIndex + 1 === thisIndex || previousIndex - 1 === thisIndex)
+        ) {
+          const editorRect = editor.getBoundingClientRect();
+
+          editor.setCaretPoint(
+            previousCaretPoint.x,
+            opts?.position === "end" ? editorRect.bottom : editorRect.top
+          );
+
+          previouslyFocusedCell = null;
+          previousCaretPoint = null;
+        }
+      }
     }
 
     async run() {

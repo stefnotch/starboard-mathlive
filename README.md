@@ -33,6 +33,8 @@ todo:
 > Or autocompleting according to what was written in the previous line
 
 todo: autoalign? As in x = a = b = c = d in an aligned environment with the equals signs below each other
+todo: context menu formatting (clear formatting, color, bold, ..)
+
 
 look at https://www.symbolab.com/ , since it does some useful things
 

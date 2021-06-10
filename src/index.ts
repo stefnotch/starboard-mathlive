@@ -1,18 +1,22 @@
 // @ts-ignore
 import "mathlive/dist/mathlive-fonts.css";
 
-import {
+import type {
   CellTypeDefinition,
   CellHandlerAttachParameters,
   CellHandler,
   CellElements,
   Cell,
   StarboardPlugin,
+  Runtime,
 } from "starboard-notebook/dist/src/types";
-import { Runtime } from "starboard-notebook/dist/src/types";
 import type { MathfieldElement } from "mathlive";
+import type { OutputFormat } from "mathlive/dist/public/mathfield";
 import type Lit from "lit";
-import { OutputFormat } from "mathlive/dist/public/mathfield";
+import {
+  parse as parseMathJson,
+  serialize as serializeMathJson,
+} from "@cortex-js/math-json"; // TODO: Convince mathlive to expose this
 
 const mathlivePromise = import("mathlive");
 
@@ -191,12 +195,66 @@ function useContextMenu(lit: typeof Lit) {
   return { styles, contextMenu, showContextMenu };
 }
 
+function parseCellContent(textContent: string) {
+  // Parse mathjson and use latex as fallback content
+  // It's like this for now, because mathjson is still in beta, I guess
+  const cellText = textContent;
+  if (cellText.startsWith("$") && cellText.endsWith("$")) {
+    return cellText.replace(/^\$+|\$+$/g, "");
+  } else {
+    let lines = cellText.split("\n").filter((v) => v.length > 0);
+    let parsedMathJson = "";
+    try {
+      parsedMathJson = serializeMathJson(JSON.parse(lines[0]));
+    } catch (e) {
+      parsedMathJson = "";
+    }
+    if (parsedMathJson) {
+      return parsedMathJson;
+    } else if (lines.length > 1) {
+      return lines[1].replace(/^\$+|\$+$/g, "");
+    }
+  }
+  return "";
+}
+
 export function registerMathlive(runtime: Runtime) {
   /* These globals are exposed by Starboard Notebook. We can re-use them so we don't have to bundle them again. */
   const lit = runtime.exports.libraries.lit;
 
   const StarboardTextEditor = runtime.exports.elements.StarboardTextEditor;
   const cellControlsTemplate = runtime.exports.templates.cellControls;
+
+  // Definitely a hack
+  // @ts-ignore
+  window["mathlive-to-expanded-latex"] = async function mathliveSerializer() {
+    const ml = await mathlivePromise;
+
+    const editor = new ml.MathfieldElement({
+      defaultMode: "math",
+      keypressSound: null,
+      plonkSound: null,
+      keypressVibration: false,
+    });
+    editor.style.opacity = "0";
+    editor.style.pointerEvents = "none";
+    document.body.appendChild(editor);
+
+    function toExpandedLatex(textContent: string) {
+      editor.value = parseCellContent(textContent);
+      console.log(editor.getValue("latex-expanded"));
+      return editor.getValue("latex-expanded");
+    }
+
+    function dispose() {
+      document.body.removeChild(editor);
+    }
+
+    return {
+      toExpandedLatex,
+      dispose,
+    };
+  };
 
   const {
     styles: contextMenuStyles,
@@ -248,10 +306,14 @@ export function registerMathlive(runtime: Runtime) {
           // smartSuperscript: true,
           removeExtraneousParentheses: true,
           smartFence: true,
-          plonkSound: null as any,
-          keypressSound: null as any,
+          plonkSound: null,
+          keypressSound: null,
           onContentDidChange: (mf) => {
-            this.cell.textContent = mf.getValue("latex");
+            this.cell.textContent =
+              mf.getValue("math-json").replace(/\n/g, "") +
+              "\n$" +
+              mf.getValue("latex") +
+              "$";
           },
           onCommit: (mf) => {
             this.run();
@@ -283,6 +345,9 @@ export function registerMathlive(runtime: Runtime) {
               return false;
             }
             return true;
+          },
+          onExport: (mf, latex, range) => {
+            return `$\\displaystyle ${latex}$`;
           },
         });
 
@@ -317,10 +382,11 @@ export function registerMathlive(runtime: Runtime) {
           return false;
         });
 
-        editor.value = this.cell.textContent;
-        editor.style.fontSize = "18px";
+        // TODO: Fix cdot
 
-        // TODO: Set caret according to viewport coordinates in the next mathfield
+        editor.value = parseCellContent(this.cell.textContent);
+
+        editor.style.fontSize = "18px";
 
         // Later down the road we can use "adoptedStyleSheets"
         const caretCustomStyle = document.createElement("style");

@@ -150,20 +150,31 @@ html`
 const outputEl = document.createElement("code");
 outputEl.classList.add("small");
 
-function serializeCell(cell) {
+function serializeCell(cell, serializeMathliveCell) {
   if (cell.cellType === "markdown") {
     return cell.textContent;
   } else if(cell.cellType === "mathlive") {
-    return "$\\displaystyle " + cell.textContent.trim() + "$";
+    if(serializeMathliveCell) {
+      return "$\\displaystyle " + serializeMathliveCell(cell.textContent) + "$";
+    } else {
+      return "$\\displaystyle " + cell.textContent.trim() + "$";
+    }
   } else {
     return `\`\`\`${cell.cellType}\n${cell.textContent}\n\`\`\``;
   }
 }
 
 // Note: Doesn't serialize any cell or notebook metadata
-function serializeAsMarkdown() {
-  const md = runtime.content.cells.filter((c,i) => i >= 2).map(c => serializeCell(c)).join("  \n")
+async function serializeAsMarkdown() {
+  let mathliveCellSerializer = null;
+  if(window["mathlive-to-expanded-latex"]) {
+    mathliveCellSerializer = await window["mathlive-to-expanded-latex"]();
+  }
+  
+  const md = runtime.content.cells.filter((c,i) => i >= 3).map(c => serializeCell(c, mathliveCellSerializer?.toExpandedLatex)).join("  \n")
   outputEl.innerText = md;
+
+  mathliveCellSerializer?.dispose();
 
   navigator.clipboard.writeText(md).then(function() {
     /* clipboard successfully set */
@@ -181,17 +192,17 @@ html`
 # Exercise
 Calculate the following
 # %% [mathlive]
-\frac{d}{dx}(\frac{3}{\log(7)}\cdot x^{3x})
+["Multiply",["Divide","d",["Multiply","d","x"]],["Parentheses",["Multiply",["Divide",{"num":"3"},["Multiply","\\log",["Parentheses",{"num":"7"}]]],["Power","x",["Multiply",{"num":"3"},"x"]]]]]
 # %% [markdown]
 ## Solution
 
 # %% [mathlive]
-\frac{d}{dx}(\frac{3}{\log(7)}\cdot x^{3x})
+["Multiply",["Divide","d",["Multiply","d","x"]],["Parentheses",["Multiply",["Divide",{"num":"3"},["Multiply","\\log",["Parentheses",{"num":"7"}]]],["Power","x",["Multiply",{"num":"3"},"x"]]]]]
 # %% [mathlive]
-\frac{d}{dx}(\frac{3}{\log(7)}\cdot e^{3x\cdot log(x)})
+["Multiply",["Divide","d",["Multiply","d","x"]],["Parentheses",["Multiply",["Divide",{"num":"3"},["Multiply","\\log",["Parentheses",{"num":"7"}]]],["Power","ExponentialE",["Multiply",{"num":"3"},"x","l","o",["g","x"]]]]]]
 # %% [mathlive]
-\frac{3}{\log(7)}\cdot e^{3x\cdot log(x)}\cdot(3\cdot\log(x)+\frac{3x}{x})
+["Multiply",["Divide",{"num":"3"},["Multiply","\\log",["Parentheses",{"num":"7"}]]],["Power","ExponentialE",["Multiply",{"num":"3"},"x","\\log",["Parentheses","x"]]],["Parentheses",["Add",["Multiply",{"num":"3"},"\\log",["Parentheses","x"]],["Divide",["Multiply",{"num":"3"},"x"],"x"]]]]
 # %% [mathlive]
-\frac{3}{\log(7)}\cdot x^{3x}\cdot(3\cdot\log(x)+3)
+["Multiply",["Divide",{"num":"3"},["Multiply","\\log",["Parentheses",{"num":"7"}]]],["Power","x",["Multiply",{"num":"3"},"x"]],["Parentheses",["Add",["Multiply",{"num":"3"},"\\log",["Parentheses","x"]],{"num":"3"}]]]
   </script>
 </body>

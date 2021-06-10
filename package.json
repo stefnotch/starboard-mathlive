@@ -43,11 +43,12 @@
     "rollup-plugin-copy": "^3.4.0",
     "rollup-plugin-dts": "^3.0.2",
     "rollup-plugin-typescript2": "^0.30.0",
-    "serve": "^11.3.2",
+    "serve": "^12.0.0",
     "starboard-notebook": "^0.11.1",
     "typescript": "^4.3.2"
   },
   "dependencies": {
-    "mathlive": "^0.67.0"
+    "@cortex-js/math-json": "^0.2.3",
+    "mathlive": "^0.69.2"
   }
 }

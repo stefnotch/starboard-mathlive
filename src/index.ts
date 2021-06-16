@@ -17,6 +17,7 @@ import {
   parse as parseMathJson,
   serialize as serializeMathJson,
 } from "@cortex-js/math-json"; // TODO: Convince mathlive to expose this
+import { Style } from "mathlive/dist/public/core";
 
 const mathlivePromise = import("mathlive");
 
@@ -86,6 +87,7 @@ function useContextMenu(lit: typeof Lit) {
   contextMenu.style.minWidth = "244px";
 
   let copyCallback = (type: OutputFormat) => {};
+  let styleCallback = (style: Style) => {};
 
   let contextMenuCloseTimeout: number | null = null;
   contextMenu.addEventListener("focusin", (ev) => {
@@ -107,23 +109,39 @@ function useContextMenu(lit: typeof Lit) {
 
   lit.render(
     lit.html`<ul>
+  <li><h6 class="context-menu-header">Format</h6></li>
+  <li>
+    <button
+      title="Clear Formatting"
+      class="context-menu-button" 
+      tabindex="0"
+      @click=${() => {
+        styleCallback({
+          color: "",
+        });
+        contextMenu.classList.remove("show");
+      }}
+    >
+     Clear
+    </button>
+    <button
+      title="Text Color"
+      class="context-menu-button" 
+      tabindex="0"
+      @click=${() => {
+        styleCallback({
+          color: "red",
+        });
+        contextMenu.classList.remove("show");
+      }}
+    >
+     Color
+    </button>
+  </li>
   <li><h6 class="context-menu-header">Copy as</h6></li>
   <li>
     <button
       title="Kinky"
-      class="context-menu-button first-focusable"
-      tabindex="0"
-      @click=${() => {
-        copyCallback("latex");
-        contextMenu.classList.remove("show");
-      }}
-    >
-     Latex
-    </button>
-  </li>
-  <li>
-    <button
-      title="Latex Expanded"
       class="context-menu-button" 
       tabindex="0"
       @click=${() => {
@@ -168,10 +186,12 @@ function useContextMenu(lit: typeof Lit) {
     x: number;
     y: number;
     copyCallback: (type: OutputFormat) => void;
+    styleCallback: (type: Style) => void;
   }) {
     // https://itnext.io/how-to-create-a-custom-right-click-menu-with-javascript-9c368bb58724
     // Check what starboard does for some of the popup menus
     copyCallback = opts.copyCallback;
+    styleCallback = opts.styleCallback;
 
     contextMenu.classList.add("transparent");
     contextMenu.classList.add("show");
@@ -372,6 +392,14 @@ export function registerMathlive(runtime: Runtime) {
                     console.log("Failed to copy to clipboard", e);
                   }
                 );
+              },
+              styleCallback: function (style: Style) {
+                let isSelectionNone = editor.selection.ranges.every(
+                  (range) => range[0] === range[1]
+                );
+                if (!isSelectionNone) {
+                  editor.applyStyle(style);
+                }
               },
             });
           }

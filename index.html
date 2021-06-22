@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8" />
+  <title>Starboard Mathlive</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link
+    href="https://unpkg.com/starboard-notebook@0.11.1/dist/starboard-notebook.css"
+    rel="stylesheet"
+  />
+  <script>
+    // Localstorage hack (so that you can load a notebook & reload the page)
+    const notebookContent = localStorage.getItem("initial-notebook");
+    if (notebookContent) {
+      localStorage.removeItem("initial-notebook");
+      window.initialNotebookContent = notebookContent;
+    }
+
+    // Unsaved changes hack
+    let hasBeforeUnload = false;
+    window.parentIFrame = {
+      sendMessage: function (message, targetOrigin) {
+        if (message?.type === "NOTEBOOK_CONTENT_UPDATE") {
+          if (!hasBeforeUnload) {
+            window.addEventListener("beforeunload", function (event) {
+              event.preventDefault();
+              event.returnValue = "Unsaved Changes";
+            });
+            hasBeforeUnload = true;
+          }
+        }
+      },
+    };
+
+    // Context menu hack (prevent the terrible matplotlib hack)
+    const _addEventListener = window.addEventListener;
+    window.addEventListener = function (eventType, listener, ...args) {
+      if (eventType === "contextmenu") return;
+      return _addEventListener.call(this, eventType, listener, ...args);
+    };
+  </script>
+  <script
+    src="https://unpkg.com/starboard-notebook@0.11.1/dist/starboard-notebook.js"
+    defer
+  ></script>
+  <style>
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    #mount-point {
+      min-height: 100%;
+    }
+  </style>
+</head>
+<body>
+  <!-- This is fine, it's just a static website -->
+  <!-- Don't do it unless you absolutely trust the input and have nothing else on the website -->
+  <!-- prettier-ignore -->
+  <script type="application/vnd.starboard.nb">
+# %%--- [esm]
+# properties:
+#   run_on_load: true
+#   top_hidden: true
+# ---%%
+/**
+ * @returns {"release"|"development"|"debug"}
+ */
+function getMode() {
+  let urlParams = new URLSearchParams(window.location.search);
+  let mode = urlParams.get("mode");
+
+  // If a mode is specified
+  if (mode != undefined) {
+    let modeString = mode.toString().toLowerCase();
+    if (modeString.includes("rel")) {
+      return "release";
+    } else if (modeString.includes("dev")) {
+      return "development";
+    } else if (modeString.includes("deb")) {
+      return "debug";
+    }
+  }
+
+  // If no mode is specified
+  // If the website is local, it's probably in dev mode
+  let hostname = window.location.hostname.toLowerCase();
+  if (hostname.startsWith("localhost") || hostname.startsWith("127.0.0.1")) {
+    return "development";
+  } else {
+    // Otherwise it's in release mode
+    return "release";
+  }
+}
+
+if(getMode() === "release") {
+  import("https://stefnotch.github.io/starboard-mathlive/index.js").then(result => {
+    runtime.controls.registerPlugin(result.plugin, {})
+  });
+} else {
+  import("http://localhost:8080/index.js").then(result => {
+    runtime.controls.registerPlugin(result.plugin, {})
+  });
+}
+
+# %%--- [javascript]
+# properties:
+#   run_on_load: true
+#   top_hidden: true
+# ---%%
+// TODO: use the cooler native filesystem API if possible
+
+function loadNotebook(event) {
+  let files = event.target.files;
+  if(files.length > 0) {
+    const reader = new FileReader();
+    reader.onload = event => {
+      localStorage.setItem("initial-notebook", event.target.result);
+      location.reload();
+    };
+    reader.onerror = error => reject(error);
+    reader.readAsText(files[0], "UTF-8");
+  }
+}
+
+function saveNotebook() {
+  let content = runtime.exports.core.notebookContentToText(runtime.content);
+  let aElement = document.createElement('a');
+  let filename = "notebook.nb";
+  let file = new File([content], filename, {type: "text/plain"});
+  aElement.href = window.URL.createObjectURL(file);
+  aElement.download = filename;
+  aElement.style.display = "none";
+  //document.body.appendChild(aElement);
+  aElement.click();
+  //document.body.removeChild(aElement);
+}
+
+html`
+  <button class="btn btn-primary m-2" @click="${saveNotebook}">Save</button>
+  <input type="file" class="btn btn-primary m-2" @change="${loadNotebook}">
+`
+
+# %%--- [javascript]
+# properties:
+#   run_on_load: true
+#   top_hidden: true
+# ---%%
+const outputEl = document.createElement("code");
+outputEl.classList.add("small");
+
+function serializeCell(cell, serializeMathliveCell) {
+  if (cell.cellType === "markdown") {
+    return cell.textContent;
+  } else if(cell.cellType === "mathlive") {
+    if(serializeMathliveCell) {
+      return "$\\displaystyle " + serializeMathliveCell(cell.textContent) + "$";
+    } else {
+      return "$\\displaystyle " + cell.textContent.trim() + "$";
+    }
+  } else {
+    return `\`\`\`${cell.cellType}\n${cell.textContent}\n\`\`\``;
+  }
+}
+
+// Note: Doesn't serialize any cell or notebook metadata
+async function serializeAsMarkdown() {
+  let mathliveCellSerializer = null;
+  if(window["mathlive-to-expanded-latex"]) {
+    mathliveCellSerializer = await window["mathlive-to-expanded-latex"]();
+  }
+  
+  const md = runtime.content.cells.filter((c,i) => i >= 3).map(c => serializeCell(c, mathliveCellSerializer?.toExpandedLatex)).join("  \n")
+  outputEl.innerText = md;
+
+  mathliveCellSerializer?.dispose();
+
+  navigator.clipboard.writeText(md).then(function() {
+    /* clipboard successfully set */
+  }, function() {
+    /* clipboard write failed */
+  });
+}
+
+html`
+  <button class="btn btn-primary m-2" @click="${serializeAsMarkdown}">Show notebook MD representation</button>
+<pre>${outputEl}</pre>
+`
+
+# %% [markdown]
+# Exercise
+Calculate the following
+# %% [mathlive]
+["Multiply",["Divide","d",["Multiply","d","x"]],["Parentheses",["Multiply",["Divide",{"num":"3"},["Multiply","\\log",["Parentheses",{"num":"7"}]]],["Power","x",["Multiply",{"num":"3"},"x"]]]]]
+# %% [markdown]
+## Solution
+
+# %% [mathlive]
+["Multiply",["Divide","d",["Multiply","d","x"]],["Parentheses",["Multiply",["Divide",{"num":"3"},["Multiply","\\log",["Parentheses",{"num":"7"}]]],["Power","x",["Multiply",{"num":"3"},"x"]]]]]
+# %% [mathlive]
+["Multiply",["Divide","d",["Multiply","d","x"]],["Parentheses",["Multiply",["Divide",{"num":"3"},["Multiply","\\log",["Parentheses",{"num":"7"}]]],["Power","ExponentialE",["Multiply",{"num":"3"},"x","l","o",["g","x"]]]]]]
+# %% [mathlive]
+["Multiply",["Divide",{"num":"3"},["Multiply","\\log",["Parentheses",{"num":"7"}]]],["Power","ExponentialE",["Multiply",{"num":"3"},"x","\\log",["Parentheses","x"]]],["Parentheses",["Add",["Multiply",{"num":"3"},"\\log",["Parentheses","x"]],["Divide",["Multiply",{"num":"3"},"x"],"x"]]]]
+# %% [mathlive]
+["Multiply",["Divide",{"num":"3"},["Multiply","\\log",["Parentheses",{"num":"7"}]]],["Power","x",["Multiply",{"num":"3"},"x"]],["Parentheses",["Add",["Multiply",{"num":"3"},"\\log",["Parentheses","x"]],{"num":"3"}]]]
+  </script>
+</body>

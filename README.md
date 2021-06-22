@@ -10,9 +10,7 @@ Some quick shortcut/typing to insert a new cell type??
 `js`: the search thingy is searching for js and suggests the Javascript cell type  
 `Enter`: Inserts the Javascript cell
 
-use starboard-wrap for the demo
-
-[native filesystem](https://web.dev/file-system-access/), including opening an entire directory (persist in indexeddb and use this library https://web.dev/browser-fs-access/ )
+use starboard-editor for the demo https://github.com/stefnotch/starboard-editor
 
 Undo and redo support for deleting/adding cells
 

@@ -16,7 +16,7 @@ import type Lit from "lit";
 import {
   parse as parseMathJson,
   serialize as serializeMathJson,
-} from "@cortex-js/math-json"; // TODO: Convince mathlive to expose this
+} from "@cortex-js/compute-engine";
 import { Style } from "mathlive/dist/public/core";
 
 const mathlivePromise = import("mathlive");
@@ -384,7 +384,7 @@ export function registerMathlive(runtime: Runtime) {
                 const selectedText = isSelectionNone
                   ? editor.getValue(type)
                   : editor.getValue(editor.selection, type);
-                navigator.clipboard.writeText(selectedText + "").then(
+                navigator.clipboard.writeText("" + selectedText).then(
                   function () {
                     console.log("Copied to clipboard");
                   },

@@ -35,6 +35,12 @@ look at https://www.symbolab.com/ , since it does some useful things
 
 advertise mathlive (+mathjson) and starboard
 
+todo: I guess a reasonable middle ground would be:
+1. Let the user edit the source (metadata and cells).
+2. If the parent page supports reloading the notebook, do that. (maybe that should be passed as a runtimeConfig? Or is there a neater way?)
+3. Otherwise, if the metadata changed, update it. And for the cells, do a little diffing (all one needs to check is if the cell still exists and where it is) and update them. Better than nothing, I guess
+4. https://discord.com/channels/818559380827144253/818559381398487052/857203355053719562
+
 Import/export plugin
 https://discord.com/channels/818559380827144253/818559381398487052/838187388362424331
 https://starboard.gg/gz/custom-serialization-nNFrigs

@@ -53,3 +53,5 @@ Starboard UI improvements :thinking: (like the add cell button location, especia
 publish to npm
 
 We can probably avoid shipping the KaTeX fonts (because starboard depends on KaTeX)
+
+Interesting: https://curvenote.github.io/editor/
